@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.InOutOrderListDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.in_out_order_id as inOutOrderId
+        ,a.goods_id as goodsId
+        ,a.order_number as orderNumber
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.InOutOrderListView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,goods.goods_name as goodsName
+        ,goods.goods_types as goodsTypes
+        ,goods.goods_number as goodsNumber
+        ,goods.goods_photo as goodsPhoto
+        ,goods.danwei as danwei
+        ,goods.danjia as danjia
+        ,goods.goods_content as goodsContent
+        ,goods.flag as flag
+        ,inOutOrder.order_name as orderName
+        ,inOutOrder.caozuo_name as caozuoName
+        ,inOutOrder.caozuo_table as caozuoTable
+        ,inOutOrder.order_types as orderTypes
+        ,inOutOrder.insert_time as insertTime
+
+        FROM in_out_order_list  a
+        left JOIN goods goods ON a.goods_id = goods.id
+        left JOIN in_out_order inOutOrder ON a.in_out_order_id = inOutOrder.id
+
+        <where>
+            <if test="params.inOutOrderId != null">
+                and a.in_out_order_id = #{params.inOutOrderId}
+            </if>
+            <if test="params.goodsId != null">
+                and a.goods_id = #{params.goodsId}
+            </if>
+            <if test="params.orderNumberStart != null">
+                <![CDATA[  and a.order_number >= #{params.orderNumberStart}   ]]>
+            </if>
+            <if test="params.orderNumberEnd != null">
+                <![CDATA[  and a.order_number <= #{params.orderNumberEnd}   ]]>
+            </if>
+
+            <if test=" params.goodsName != '' and params.goodsName != null and params.goodsName != 'null' ">
+                and goods.goods_name like CONCAT('%',#{params.goodsName},'%')
+            </if>
+            <if test="params.goodsTypes != null">
+                and goods.goods_types = #{params.goodsTypes}
+            </if>
+
+            <if test="params.goodsNumberStart != null ">
+                <![CDATA[  and goods.goods_number >= #{params.goodsNumberStart}   ]]>
+            </if>
+            <if test="params.goodsNumberEnd != null ">
+                <![CDATA[  and goods.goods_number <= #{params.goodsNumberEnd}   ]]>
+            </if>
+            <if test=" params.danwei != '' and params.danwei != null and params.danwei != 'null' ">
+                and goods.danwei like CONCAT('%',#{params.danwei},'%')
+            </if>
+            <if test="params.danjiaStart != null ">
+                <![CDATA[  and goods.danjia >= #{params.danjiaStart}   ]]>
+            </if>
+            <if test="params.danjiaEnd != null ">
+                <![CDATA[  and goods.danjia <= #{params.danjiaEnd}   ]]>
+            </if>
+            <if test=" params.goodsContent != '' and params.goodsContent != null and params.goodsContent != 'null' ">
+                and goods.goods_content like CONCAT('%',#{params.goodsContent},'%')
+            </if>
+            <if test="params.flagStart != null ">
+                <![CDATA[  and goods.flag >= #{params.flagStart}   ]]>
+            </if>
+            <if test="params.flagEnd != null ">
+                <![CDATA[  and goods.flag <= #{params.flagEnd}   ]]>
+            </if>
+            <if test=" params.orderName != '' and params.orderName != null and params.orderName != 'null' ">
+                and inOutOrder.order_name like CONCAT('%',#{params.orderName},'%')
+            </if>
+            <if test=" params.caozuoName != '' and params.caozuoName != null and params.caozuoName != 'null' ">
+                and inOutOrder.caozuo_name like CONCAT('%',#{params.caozuoName},'%')
+            </if>
+            <if test=" params.caozuoTable != '' and params.caozuoTable != null and params.caozuoTable != 'null' ">
+                and inOutOrder.caozuo_table like CONCAT('%',#{params.caozuoTable},'%')
+            </if>
+            <if test="params.orderTypes != null">
+                and inOutOrder.order_types = #{params.orderTypes}
+            </if>
+
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(inOutOrder.insert_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.insertTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(inOutOrder.insert_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.insertTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+        </where>
+        order by a.id desc
+    </select>
+
+</mapper>

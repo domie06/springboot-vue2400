@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.InOutOrderDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.order_name as orderName
+        ,a.caozuo_name as caozuoName
+        ,a.caozuo_table as caozuoTable
+        ,a.order_types as orderTypes
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.InOutOrderView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM in_out_order  a
+
+        <where>
+            <if test=" params.orderName != '' and params.orderName != null and params.orderName != 'null' ">
+                and a.order_name like CONCAT('%',#{params.orderName},'%')
+            </if>
+            <if test=" params.caozuoName != '' and params.caozuoName != null and params.caozuoName != 'null' ">
+                and a.caozuo_name like CONCAT('%',#{params.caozuoName},'%')
+            </if>
+            <if test=" params.caozuoTable != '' and params.caozuoTable != null and params.caozuoTable != 'null' ">
+                and a.caozuo_table like CONCAT('%',#{params.caozuoTable},'%')
+            </if>
+            <if test="params.orderTypes != null">
+                and a.order_types = #{params.orderTypes}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') >=
+                DATE_FORMAT(#{params.insertTimeStart}, '%Y-%m-%d %H:%T:%s')   ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and DATE_FORMAT(a.insert_time, '%Y-%m-%d %H:%T:%s') <=
+                DATE_FORMAT(#{params.insertTimeEnd} , '%Y-%m-%d %H:%T:%s')    ]]>
+            </if>
+
+        </where>
+        order by a.id desc
+    </select>
+
+</mapper>
